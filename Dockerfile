@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM debian:jessie
 MAINTAINER Michael <michael@towel.dk>
 
 # Inspired by monokrome/wine
