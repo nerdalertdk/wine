@@ -1,4 +1,4 @@
-FROM twlsw/wine:latest
+FROM suchja/x11client:latest
 MAINTAINER Michael <michael@towel.dk>
 
 # Inspired by monokrome/wine
