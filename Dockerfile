@@ -1,4 +1,4 @@
-FROM suchja/x11client:latest
+FROM alpine:latest
 MAINTAINER Michael <michael@towel.dk>
 
 # Inspired by monokrome/wine
