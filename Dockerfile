@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM suchja/x11client
 MAINTAINER Michael <michael@towel.dk>
 
 # Inspired by monokrome/wine
