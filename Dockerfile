@@ -1,5 +1,5 @@
-FROM suchja/x11client:latest
-MAINTAINER Jan Suchotzki <jan@suchotzki.de>
+FROM twlsw/wine:latest
+MAINTAINER Michael <michael@towel.dk>
 
 # Inspired by monokrome/wine
 ENV WINE_MONO_VERSION 0.0.8
