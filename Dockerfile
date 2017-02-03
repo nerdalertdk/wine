@@ -41,5 +41,5 @@ ENV WINEARCH win32
 # Use xclient's home dir as working dir
 WORKDIR /home/xclient
 RUN wine wineboot --init
-RUN bash winetricks -q vcrun2010 && bash winetricks -q dotnet45 corefonts
-
+RUN winetricks -q vcrun2010 && winetricks -q dotnet45 corefonts
+RUN wine --version
