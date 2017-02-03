@@ -25,7 +25,7 @@ RUN dpkg --add-architecture i386 \
 RUN curl -SL 'https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks' -o /usr/local/bin/winetricks \
 		&& chmod +x /usr/local/bin/winetricks
 
-RUN bash winetricks -q vcrun2010 && bash winetricks -q dotnet45 corefonts
+#RUN bash winetricks -q vcrun2010 && bash winetricks -q dotnet45 corefonts
 
 # Get latest version of mono for wine
 RUN mkdir -p /usr/share/wine/mono \
@@ -40,3 +40,6 @@ ENV WINEARCH win32
 
 # Use xclient's home dir as working dir
 WORKDIR /home/xclient
+RUN wine wineboot --init
+RUN bash winetricks -q vcrun2010 && bash winetricks -q dotnet45 corefonts
+
