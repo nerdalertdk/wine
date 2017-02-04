@@ -58,6 +58,5 @@ RUN wine wineboot --init && waitfor xclient wineserver && wine --version
 #RUN xvfb-run -a winetricks --unattended corefonts && waitfor xclient wineserver
 #RUN xvfb-run -a winetricks --unattended dotnet40 && waitfor xclient wineserver
 RUN xvfb-run -a winetricks --unattended vcrun2010 && waitfor xclient wineserver
-RUN ls -la /home/xclient/
-ENTRYPOINT ["wine"]
+#ENTRYPOINT ["wine"]
 
