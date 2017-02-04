@@ -1,45 +1,63 @@
-FROM suchja/x11client
-MAINTAINER Michael <michael@towel.dk>
+FROM ubuntu:16.04
+MAINTAINER Towel Software <www.towel.dk>
 
-# Inspired by monokrome/wine
-ENV WINE_MONO_VERSION 0.0.8
+#ENV WINEDEBUG -all,err+all
+
 USER root
 
-# Install some tools required for creating the image
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends \
+# original script by Jan Suchotzki <jan@suchotzki.de>
+# from https://github.com/suchja/wix-toolset/blob/master/waitonprocess.sh
+RUN echo $'[ $# -lt 2 ] && echo "Usage: $0 USER PROCESS-NAMES..." >&2 && exit 1 \n\
+USER="$1" \n\
+shift \n\
+echo "Started waiting for $@" \n\
+while pgrep -u "$USER" "$@" > /dev/null; do \n\
+	echo "waiting ..." \n\
+	sleep 1; \n\
+done \n\
+echo "$@ completed"'\
+>> /usr/local/bin/waitfor
+RUN cat /usr/local/bin/waitfor
+RUN chmod +x /usr/local/bin/waitfor
+RUN which waitfor
+
+RUN apt-get update --assume-yes
+RUN apt-get install --no-install-recommends --assume-yes software-properties-common \
+	&& add-apt-repository --yes ppa:ricotz/unstable
+RUN apt-get purge --assume-yes software-properties-common
+RUN dpkg --add-architecture i386
+RUN apt-get update --assume-yes
+RUN apt-get install --no-install-recommends --assume-yes \
+		wine2.0 \
 		curl \
-		unzip \
-		ca-certificates
+		winetricks \
+		cabextract \
+		xvfb
+RUN apt-mark manual \
+		wine2.0 \
+		curl \
+		winetricks \
+		cabextract \
+		xvfb
+RUN apt-get autoclean --assume-yes \
+	&& apt-get autoremove --assume-yes
 
-# Install wine and related packages
-RUN dpkg --add-architecture i386 \
-		&& apt-get update \
-		&& apt-get install -y --no-install-recommends \
-				wine \
-				wine32 \
-				cabextract \
-		&& rm -rf /var/lib/apt/lists/*
+RUN curl -o /usr/local/bin/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
+RUN chmod +x /usr/local/bin/winetricks
+RUN which winetricks
 
-# Use the latest version of winetricks
-RUN curl -SL 'https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks' -o /usr/local/bin/winetricks \
-		&& chmod +x /usr/local/bin/winetricks
+RUN groupadd --system xclient && useradd --create-home --system --gid xclient xclient
 
-#RUN bash winetricks -q vcrun2010 && bash winetricks -q dotnet45 corefonts
-
-# Get latest version of mono for wine
-RUN mkdir -p /usr/share/wine/mono \
-	&& curl -SL 'http://sourceforge.net/projects/wine/files/Wine%20Mono/$WINE_MONO_VERSION/wine-mono-$WINE_MONO_VERSION.msi/download' -o /usr/share/wine/mono/wine-mono-$WINE_MONO_VERSION.msi \
-	&& chmod +x /usr/share/wine/mono/wine-mono-$WINE_MONO_VERSION.msi
-
-# Wine really doesn't like to be run as root, so let's use a non-root user
 USER xclient
 ENV HOME /home/xclient
 ENV WINEPREFIX /home/xclient/.wine
-ENV WINEARCH win32
-
-# Use xclient's home dir as working dir
+ENV WINEARCH win64
 WORKDIR /home/xclient
-RUN wine wineboot --init
-RUN winetricks -q vcrun2010 && winetricks -q dotnet45 corefonts
-RUN wine --version
+#RUN rm -rf /home/xclient/.wine
+RUN wine wineboot --init && waitfor xclient wineserver && wine --version
+#RUN xvfb-run -a winetricks --unattended corefonts && waitfor xclient wineserver
+#RUN xvfb-run -a winetricks --unattended dotnet40 && waitfor xclient wineserver
+RUN xvfb-run -a winetricks --unattended vcrun2010 && waitfor xclient wineserver
+RUN ls -la /home/xclient/
+ENTRYPOINT ["wine"]
+
