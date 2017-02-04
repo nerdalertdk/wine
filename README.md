@@ -1,6 +1,6 @@
 ## About
 
-https://hub.docker.com/r/suchja/wine/ Clone but with vcrun2010 / cabextract /dotnet45 / corefonts
+Ubuntu 16.04 / WINE 2.0 with vcrun2010 / cabextract
 
 ## Maintenance
 
